@@ -1,0 +1,40 @@
+# Visual Studio directories
+.vs/
+.vscode/
+
+# Build directories
+Debug/
+Release/
+x64/
+x86/
+bin/
+obj/
+
+# Build artifacts
+*.exe
+*.dll
+*.lib
+*.obj
+*.ilk
+*.pdb
+*.exp
+
+# User-specific files
+*.vcxproj.user
+*.sln.user
+*.suo
+*.user
+
+# Visual Studio cache/options
+.vscode/settings.json
+
+# Dependency directories
+packages/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE backups
+*.bak
+*~
