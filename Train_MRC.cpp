@@ -143,6 +143,17 @@ void drawFarMountain(float x, float h) {
     glEnd();
 }
 
+void drawGround() {
+    glBegin(GL_POLYGON);
+    glColor3f(0, 0.6, 0.1);         // Color of the bottom grass
+    glVertex2f(0, 0);
+    glVertex2f(winW, 0);
+    glColor3f(0, 0.5, 0.1);         // Color of the top grass
+    glVertex2f(winW, baseHeight);
+    glVertex2f(0, baseHeight);
+    glEnd();
+}
+
 void display() {
     drawSky();
 
@@ -176,6 +187,8 @@ void display() {
         GLfloat x = i * 240 - offset;
         drawMountain(x, heightsFront[i]);
     }
+
+    drawGround();
 
     glutSwapBuffers();// swaps hidden buffer with visible buffer
 }
