@@ -77,9 +77,10 @@ void drawSun() {
     // FIX: make it work with projection 
     float worldWidth = 400.0f * ((float)winW / winH);
 
-    float x = cos(sunAngle) * (worldWidth / 2.0f - 50) + worldWidth / 2.0f; // the x changes to adapt with the new windows changes
-    float y = sin(sunAngle) * 150 + 200;
-
+	// coordinates of a ellipse around the center of the screen, 
+	float x = cos(sunAngle) * (worldWidth / 2.0f + 50) + worldWidth / 2.0f; // cos(x)*radius + centerX 
+	float y = sin(sunAngle) * 150 + 200;// sin(x)* radius + centerY
+	//centerX and centerY are two focus points of the ellipse, radius is the distance from the center to the edge of the ellipse along the x or y axis.
     //  FIX: draw a 2D filled circle instead of glutSolidSphere
     // glutSolidSphere is 3D and renders hollow/broken in 2D ortho projection
     glColor3f(1.0f, 0.95f, 0.3f);  // warm yellow sun
@@ -94,7 +95,7 @@ void drawMoon() {
     // FIX: same correction as sun
     float worldWidth = 400.0f * ((float)winW / winH);
 
-    float x = cos(moonAngle) * (worldWidth / 2.0f - 50) + worldWidth / 2.0f;
+    float x = cos(moonAngle) * (worldWidth / 2.0f + 50) + worldWidth / 2.0f;
     float y = sin(moonAngle) * 150 + 200;
 
     // FIX: draw a 2D filled circle instead of glutSolidSphere
@@ -204,8 +205,8 @@ void update() {
     if (offsetFar >= 280 * 26) offsetFar -= 280 * 26;
 
     //  merged day/night cycle here
-    sunAngle += 0.001f;
-    moonAngle += 0.001f;
+    sunAngle += 0.0001f;
+    moonAngle += 0.0001f;
     //Making sure the val is always between 0 -> 2PI
     if (sunAngle > 2 * 3.14159f)
         sunAngle = 0.0f;
