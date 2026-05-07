@@ -9,8 +9,7 @@ float moonAngle = 3.14159f; //since moon is opposite to the sun, we start from t
 float red = 0.0f, green = 0.0f, blue = 0.0f; // background color
 
 float offset = 0;           // Will start at 0, used to shift mountains to the left
-float offsetBack = 0;       // This will be used for the mountains behind
-float offsetFar = 0;        // Farthest back layer
+float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
 float heightsFar[30];       // Far layer heights
@@ -76,9 +75,10 @@ void drawSun() {
     // FIX: make it work with projection 
     float worldWidth = 400.0f * ((float)winW / winH);
 
-    float x = cos(sunAngle) * (worldWidth / 2.0f - 50) + worldWidth / 2.0f; // the x changes to adapt with the new windows changes
-    float y = sin(sunAngle) * 150 + 200;
-
+	// coordinates of a ellipse around the center of the screen, 
+	float x = cos(sunAngle) * (worldWidth / 2.0f + 50) + worldWidth / 2.0f; // cos(x)*radius + centerX 
+	float y = sin(sunAngle) * 150 + 200;// sin(x)* radius + centerY
+	//centerX and centerY are two focus points of the ellipse, radius is the distance from the center to the edge of the ellipse along the x or y axis.
     //  FIX: draw a 2D filled circle instead of glutSolidSphere
     // glutSolidSphere is 3D and renders hollow/broken in 2D ortho projection
     glColor3f(1.0f, 0.95f, 0.3f);  // warm yellow sun
@@ -93,7 +93,7 @@ void drawMoon() {
     // FIX: same correction as sun
     float worldWidth = 400.0f * ((float)winW / winH);
 
-    float x = cos(moonAngle) * (worldWidth / 2.0f - 50) + worldWidth / 2.0f;
+    float x = cos(moonAngle) * (worldWidth / 2.0f + 50) + worldWidth / 2.0f;
     float y = sin(moonAngle) * 150 + 200;
 
     // FIX: draw a 2D filled circle instead of glutSolidSphere
@@ -108,13 +108,13 @@ void drawMoon() {
 void drawMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // main triangle — left base pulled back by 40 to overlap with previous mountain
-    glVertex2f(x - 40, 0);
-    glVertex2f(x + 240, 0);
-    glVertex2f(x + 120, h);
+    glVertex2f(x - 40, baseHeight);
+    glVertex2f(x + 240, baseHeight);
+    glVertex2f(x + 120, h + baseHeight);
     // right bump
-    glVertex2f(x + 120, h * 0.55f);
-    glVertex2f(x + 240, 0);
-    glVertex2f(x + 180, h * 0.65f);
+    glVertex2f(x + 120, h * 0.55f + baseHeight);
+    glVertex2f(x + 240, baseHeight);
+    glVertex2f(x + 180, h * 0.65f + baseHeight);
     glEnd();
 }
 
@@ -122,13 +122,13 @@ void drawMountain(float x, float h) {
 void drawBackMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // main triangle — left base pulled back by 30
-    glVertex2f(x - 30, 0);
-    glVertex2f(x + 200, 0);
-    glVertex2f(x + 100, h);
+    glVertex2f(x - 30, baseHeight);
+    glVertex2f(x + 200, baseHeight);
+    glVertex2f(x + 100, h + baseHeight);
     // right shoulder
-    glVertex2f(x + 100, h * 0.5f);
-    glVertex2f(x + 200, 0);
-    glVertex2f(x + 150, h * 0.6f);
+    glVertex2f(x + 100, h * 0.5f + baseHeight);
+    glVertex2f(x + 200, baseHeight);
+    glVertex2f(x + 150, h * 0.6f + baseHeight);
     glEnd();
 }
 
@@ -136,9 +136,20 @@ void drawBackMountain(float x, float h) {
 void drawFarMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // left base pulled back by 40 to blend with neighbour
-    glVertex2f(x - 40, 0);
-    glVertex2f(x + 280, 0);
-    glVertex2f(x + 140, h);
+    glVertex2f(x - 40, baseHeight);
+    glVertex2f(x + 280, baseHeight);
+    glVertex2f(x + 140, h + baseHeight);
+    glEnd();
+}
+
+void drawGround() {
+    glBegin(GL_POLYGON);
+    glColor3f(0, 0.6, 0.1);         // Color of the bottom grass
+    glVertex2f(0, 0);
+    glVertex2f(winW, 0);
+    glColor3f(0, 0.5, 0.1);         // Color of the top grass
+    glVertex2f(winW, baseHeight);
+    glVertex2f(0, baseHeight);
     glEnd();
 }
 
@@ -158,14 +169,14 @@ void display() {
     // FAR BACK (darkest, tallest, draw first)
     glColor3f(0.25, 0.25, 0.35);
     for (int i = 0; i < 30; i++) {
-        GLfloat x = i * 280 - offsetFar;
+        GLfloat x = i * 280 - offset / (0.5f/0.06f);
         drawFarMountain(x, heightsFar[i]);
     }
 
     // BACKGROUND (draw second)
     glColor3f(0.38, 0.40, 0.52);
     for (int i = 0; i < 30; i++) {
-        GLfloat x = i * 200 - offsetBack;
+        GLfloat x = i * 200 - offset / (0.5f/0.18f);
         drawBackMountain(x, heightsMid[i]);
     }
 
@@ -176,22 +187,20 @@ void display() {
         drawMountain(x, heightsFront[i]);
     }
 
+    drawGround();
+
     glutSwapBuffers();// swaps hidden buffer with visible buffer
 }
 
 void update() {
-    offset += 0.5f;    // front moves faster
-    offsetBack += 0.18f;   // back moves slower
-    offsetFar += 0.06f;   // far back moves slowest
+    offset += 0.5f;    // moves the offset
 
     // reset early 
     if (offset >= 240 * 26) offset -= 240 * 26;
-    if (offsetBack >= 200 * 26) offsetBack -= 200 * 26;
-    if (offsetFar >= 280 * 26) offsetFar -= 280 * 26;
 
     //  merged day/night cycle here
-    sunAngle += 0.001f;
-    moonAngle += 0.001f;
+    sunAngle += 0.0001f;
+    moonAngle += 0.0001f;
     //Making sure the val is always between 0 -> 2PI
     if (sunAngle > 2 * 3.14159f)
         sunAngle = 0.0f;
