@@ -11,6 +11,7 @@ float red = 0.0f, green = 0.0f, blue = 0.0f; // background color
 float offset = 0;           // Will start at 0, used to shift mountains to the left
 float offsetBack = 0;       // This will be used for the mountains behind
 float offsetFar = 0;        // Farthest back layer
+float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
 float heightsFar[30];       // Far layer heights
@@ -108,13 +109,13 @@ void drawMoon() {
 void drawMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // main triangle — left base pulled back by 40 to overlap with previous mountain
-    glVertex2f(x - 40, 0);
-    glVertex2f(x + 240, 0);
-    glVertex2f(x + 120, h);
+    glVertex2f(x - 40, baseHeight);
+    glVertex2f(x + 240, baseHeight);
+    glVertex2f(x + 120, h + baseHeight);
     // right bump
-    glVertex2f(x + 120, h * 0.55f);
-    glVertex2f(x + 240, 0);
-    glVertex2f(x + 180, h * 0.65f);
+    glVertex2f(x + 120, h * 0.55f + baseHeight);
+    glVertex2f(x + 240, baseHeight);
+    glVertex2f(x + 180, h * 0.65f + baseHeight);
     glEnd();
 }
 
@@ -122,13 +123,13 @@ void drawMountain(float x, float h) {
 void drawBackMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // main triangle — left base pulled back by 30
-    glVertex2f(x - 30, 0);
-    glVertex2f(x + 200, 0);
-    glVertex2f(x + 100, h);
+    glVertex2f(x - 30, baseHeight);
+    glVertex2f(x + 200, baseHeight);
+    glVertex2f(x + 100, h + baseHeight);
     // right shoulder
-    glVertex2f(x + 100, h * 0.5f);
-    glVertex2f(x + 200, 0);
-    glVertex2f(x + 150, h * 0.6f);
+    glVertex2f(x + 100, h * 0.5f + baseHeight);
+    glVertex2f(x + 200, baseHeight);
+    glVertex2f(x + 150, h * 0.6f + baseHeight);
     glEnd();
 }
 
@@ -136,9 +137,9 @@ void drawBackMountain(float x, float h) {
 void drawFarMountain(float x, float h) {
     glBegin(GL_TRIANGLES);
     // left base pulled back by 40 to blend with neighbour
-    glVertex2f(x - 40, 0);
-    glVertex2f(x + 280, 0);
-    glVertex2f(x + 140, h);
+    glVertex2f(x - 40, baseHeight);
+    glVertex2f(x + 280, baseHeight);
+    glVertex2f(x + 140, h + baseHeight);
     glEnd();
 }
 
