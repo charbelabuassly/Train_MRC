@@ -213,7 +213,7 @@ void reshape(int w, int h) {
     float aspect = (float)w / (float)h;
     gluOrtho2D(0, 400 * aspect, 0, 400); //creates the new matrix
 
-    glMatrixMode(GL_MODELVIEW); // 🔥 important to switch back
+    glMatrixMode(GL_MODELVIEW); //  important to switch back
 }
 
 void init() {
