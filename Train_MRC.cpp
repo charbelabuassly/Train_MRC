@@ -15,9 +15,9 @@ float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
 float heightsFar[30];       // Far layer heights
-float groundColor[12] = {0.3, 0.34, 0.37, 0.4, 0.36, 0.33, 0.38, 0.43, 0.48, 0.44, 0.37, 0.32};
+float groundColor[12];
 int patchCount = 12;         // Number of patches of green on the ground, change array size when changing this
-int patchLength = 1105;     // Length of each patch of green
+int patchLength = 1110;     // Length of each patch of green
 int winW = 800, winH = 400; // current window size — updated on resize
 
 float trainBaseY = baseHeight - 60; //Used to make sure all train cabins are on the same base height
@@ -371,6 +371,10 @@ void init() {
         heightsFar[i] = 210 + rand() % 80;
         heightsMid[i] = 180 + rand() % 60;
         heightsFront[i] = 90 + rand() % 50;
+    }
+
+    for (int i = 0; i < patchCount; i++) {
+        groundColor[i] = rand() % 10 * 0.01 + 0.3;
     }
 }
 
