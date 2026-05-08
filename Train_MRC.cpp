@@ -15,6 +15,9 @@ float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
 float heightsFar[30];       // Far layer heights
+float groundColor[6];
+int patchCount = 12;         // Number of patches of green on the ground, change array size when changing this
+int patchLength = 1110;     // Length of each patch of green
 int winW = 800, winH = 400; // current window size — updated on resize
 
 // draws a filled 2D circle at (cx, cy) with given radius
@@ -145,14 +148,47 @@ void drawFarMountain(float x, float h) {
 }
 
 void drawGround() {
-    glBegin(GL_POLYGON);
-    glColor3f(0, 0.6, 0.1);         // Color of the bottom grass
-    glVertex2f(0, 0);
-    glVertex2f(winW, 0);
-    glColor3f(0, 0.5, 0.1);         // Color of the top grass
-    glVertex2f(winW, baseHeight);
-    glVertex2f(0, baseHeight);
-    glEnd();
+    // Take the offset reset length, divide it into different patches with linked colors and increase length a little, and reset the same at offset
+
+    int groundSpeed = 2;
+
+    for (int i = 1; i < patchCount + 1; i++) {
+        glBegin(GL_POLYGON);
+        glColor3f(0, groundColor[i - 1], 0.1);          // color of the previous patch of grass
+        glVertex2f((i-1) * patchLength - offset * groundSpeed, 0);
+        glColor3f(0, groundColor[i % patchCount], 0.1);              // color of this patch of grass
+        glVertex2f((i - 1) * patchLength + patchLength - offset * groundSpeed, 0);
+        glVertex2f((i - 1) * patchLength + patchLength - offset * groundSpeed, baseHeight);
+        glColor3f(0, groundColor[i - 1], 0.1);          // color of the previous patch of grass
+        glVertex2f((i - 1) * patchLength - offset * groundSpeed, baseHeight);
+        glEnd();
+    }
+
+    //int lineWidth = winW / groundLines;               // width of each line
+    //int patchHeight = baseHeight / linePatchs;              // height of each color on the line
+    //for (int i = 0; i < groundLines; i++) {             // for every line
+    //    for (int j = 0; j < linePatchs; j++) {          // every color square
+    //        if (j != 0) {
+    //            glBegin(GL_POLYGON);
+    //            glColor3f(0, groundColor[i][j-1], 0.1);           // color of the previous patch of grass
+    //            glVertex2f(i * lineWidth, j * patchHeight);
+    //            glVertex2f(i * lineWidth + lineWidth, j * patchHeight);
+    //            glColor3f(0, groundColor[i][j], 0.1);           // color of this patch of grass
+    //            glVertex2f(i * lineWidth + lineWidth, j * patchHeight + patchHeight);
+    //            glVertex2f(i * lineWidth, j * patchHeight + patchHeight);
+    //            glEnd();
+    //        }
+    //        else {
+    //            glBegin(GL_POLYGON);
+    //            glColor3f(0, groundColor[i][j], 0.1);           // color of the patch of grass
+    //            glVertex2f(i * lineWidth, j * patchHeight);
+    //            glVertex2f(i * lineWidth + lineWidth, j * patchHeight);
+    //            glVertex2f(i * lineWidth + lineWidth, j * patchHeight + patchHeight);
+    //            glVertex2f(i * lineWidth, j * patchHeight + patchHeight);
+    //            glEnd();
+    //        }
+    //    }
+    //}
 }
 
 void display() {
@@ -213,6 +249,19 @@ void update() {
     if (moonAngle > 2 * 3.14159f)
         moonAngle = 0.0f;
 
+    //for (int i = 0; i < groundLines - 1; i++) {
+    //    for (int j = 0; j < linePatchs; j++) {
+    //        groundColor[i][j] = groundColor[i + 1][j];
+    //    }
+    //}
+
+    //for (int j = 0; j < linePatchs; j++) {      // for every color square
+    //    if (j != 0)
+    //        groundColor[groundLines-1][j] = (rand() % 10 * 0.01 + 0.3) * 0.5 + groundColor[groundLines - 2][j - 1] * 0.5;     //random green color
+    //    else
+    //        groundColor[groundLines-1][j] = rand() % 10 * 0.01 + 0.3;
+    //}
+
     glutPostRedisplay();// redraws the screen
 }
 
@@ -240,6 +289,19 @@ void init() {
         heightsMid[i] = 180 + rand() % 60;
         heightsFront[i] = 90 + rand() % 50;
     }
+
+    for (int i = 0; i < patchCount; i++) {
+        groundColor[i] = rand() % 10 * 0.01 + 0.3;
+    }
+
+    //for (int i = 0; i < groundLines; i++) {          // for every line
+    //    for (int j = 0; j < linePatchs; j++) {      // for every color square
+    //        if (i != 0 and j != 0)
+    //            groundColor[i][j] = (rand() % 10 * 0.01 + 0.3) * 0.5 + groundColor[i - 1][j - 1] * 0.5;     //random green color
+    //        else
+    //            groundColor[i][j] = rand() % 10 * 0.01 + 0.3;
+    //    }
+    //}
 }
 
 int main(int argc, char** argv) {
