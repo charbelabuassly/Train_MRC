@@ -9,6 +9,8 @@ float moonAngle = 3.14159f; //since moon is opposite to the sun, we start from t
 float red = 0.0f, green = 0.0f, blue = 0.0f; // background color
 
 float offset = 0;           // Will start at 0, used to shift mountains to the left
+float offsetBack = 0;       // This will be used for the mountains behind
+float offsetFar = 0;        // Farthest back layer
 float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
@@ -290,14 +292,14 @@ void display() {
     // FAR BACK (darkest, tallest, draw first)
     glColor3f(0.25, 0.25, 0.35);
     for (int i = 0; i < 30; i++) {
-        GLfloat x = i * 280 - offset / (0.5f / 0.06f);
+        GLfloat x = i * 280 - offsetFar;
         drawFarMountain(x, heightsFar[i]);
     }
 
     // BACKGROUND (draw second)
     glColor3f(0.38, 0.40, 0.52);
     for (int i = 0; i < 30; i++) {
-        GLfloat x = i * 200 - offset / (0.5f / 0.18f);
+        GLfloat x = i * 200 - offsetBack;
         drawBackMountain(x, heightsMid[i]);
     }
 
@@ -316,10 +318,14 @@ void display() {
 }
 
 void update() {
-    offset += 0.5f;    // moves the offset
+    offset += 0.5f;    // front moves faster
+    offsetBack += 0.18f;   // back moves slower
+    offsetFar += 0.06f;   // far back moves slowest
 
     // reset early 
     if (offset >= 240 * 26) offset -= 240 * 26;
+    if (offsetBack >= 200 * 26) offsetBack -= 200 * 26;
+    if (offsetFar >= 280 * 26) offsetFar -= 280 * 26;
 
     //  merged day/night cycle here
     sunAngle += 0.0001f;
