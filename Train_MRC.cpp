@@ -15,6 +15,9 @@ float baseHeight = 100;       // The starting height of the mountains
 float heightsFront[30];     // Stores fixed mountain heights so they don't change every frame
 float heightsMid[30];       // Mid layer heights
 float heightsFar[30];       // Far layer heights
+float groundColor[12];
+int patchCount = 12;         // Number of patches of green on the ground, change array size when changing this
+int patchLength = 1110;     // Length of each patch of green
 int winW = 800, winH = 400; // current window size — updated on resize
 
 float trainBaseY = baseHeight - 60; //Used to make sure all train cabins are on the same base height
@@ -144,14 +147,22 @@ void drawFarMountain(float x, float h) {
 }
 
 void drawGround() {
-    glBegin(GL_POLYGON);
-    glColor3f(0.05f, 0.35f, 0.10f);
-    glVertex2f(0, 0); // bottom-left
-    glVertex2f(winW, 0);// bottom-right
-    glColor3f(0.08f, 0.45f, 0.12f);
-    glVertex2f(winW, baseHeight); // top-right
-    glVertex2f(0, baseHeight);  // top-left
-    glEnd();
+    // Take the offset reset length, divide it into different patches with linked colors and increase length a little, and reset the same at offset
+
+    int groundSpeed = 2;
+
+    for (int i = 1; i < patchCount + 1; i++) {
+        glBegin(GL_POLYGON);
+        glColor3f(0, groundColor[i - 1], 0.1);          // color of the previous patch of grass
+        glVertex2f((i - 1) * patchLength - offset * groundSpeed, 0);
+        glColor3f(0, groundColor[i % patchCount], 0.1);              // color of this patch of grass
+        glVertex2f((i - 1) * patchLength + patchLength - offset * groundSpeed, 0);
+        glVertex2f((i - 1) * patchLength + patchLength - offset * groundSpeed, baseHeight);
+        glColor3f(0, groundColor[i - 1], 0.1);          // color of the previous patch of grass
+        glVertex2f((i - 1) * patchLength - offset * groundSpeed, baseHeight);
+        glEnd();
+    }
+
 }
 
 void drawEngine(float x, float y) {
@@ -465,6 +476,10 @@ void init() {
         heightsFar[i] = 210 + rand() % 80;
         heightsMid[i] = 180 + rand() % 60;
         heightsFront[i] = 90 + rand() % 50;
+    }
+
+    for (int i = 0; i < patchCount; i++) {
+        groundColor[i] = rand() % 10 * 0.01 + 0.3;
     }
 }
 
