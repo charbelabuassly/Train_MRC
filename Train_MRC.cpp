@@ -165,6 +165,21 @@ void drawGround() {
 
 }
 
+void drawWheel(float cx, float cy, float radius) {
+    glColor3f(0.1f, 0.1f, 0.1f);
+    drawCircle(cx, cy, radius, 32);
+    glLineWidth(3.0f);
+    //the wheels added details to make it appear that it is turning by adding spokes to the wheel which are lines, and the spokes rotate based on the offset to create the illusion of movement
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glBegin(GL_LINES);
+    for (int i = 0; i < 8; i++) {
+        float angle = -offset * 0.001f + i * 3.14159f / 4; // rotates the spokes based on the offset the equation is : angle = offset * 0.1f + i * (PI / 4) where offset * 0.1f controls the rotation speed and i * (PI / 4) spaces the spokes evenly around the wheel
+        glVertex2f(cx, cy); // center of the wheel
+        glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius); // end of the 
+    }
+    glEnd();
+}
+
 void drawEngine(float x, float y) {
     float width = 120;
     float height = 60; // increased from 40 → taller engine
@@ -202,7 +217,14 @@ void drawEngine(float x, float y) {
     glEnd();
 
     // CABIN WINDOW 
-    glColor3f(0.90f, 0.80f, 0.40f);
+	// change the windows color from blue when there is sun slowly to yellow when there is moon 
+    float t = 0.5f + 0.5f * sin(moonAngle);
+
+    float r = 0.6f + t * (1.0f - 0.6f);
+    float g = 0.8f + t * (1.0f - 0.8f);
+    float b = 1.0f + t * (0.2f - 1.0f);
+
+    glColor3f(r, g, b);
     glBegin(GL_POLYGON);
     glVertex2f(x + 8, y + height / 2 + 8);  // bottom-left (slightly raised)
     glVertex2f(x + 30, y + height / 2 + 8);  // bottom-right
@@ -269,8 +291,23 @@ void drawEngine(float x, float y) {
     glVertex2f(x + width, y);            // bottom-left of triangle base
     glVertex2f(x + width + triWidth, y); // point OUTWARD 
     glEnd();
+	
 
+    drawWheel(x + 100, y, 12);
+    drawWheel(x + 20, y, 12);
+    drawWheel(x + 45, y, 12);
+
+    //Window frame
+	glColor3f(0.2f, 0.2f, 0.2f);
+	glLineWidth(4.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(x + 8, y + height / 2 + 8);  // bottom-left (slightly raised)
+    glVertex2f(x + 30, y + height / 2 + 8);  // bottom-right
+    glVertex2f(x + 30, y + height / 2 + 22); // top-right
+    glVertex2f(x + 8, y + height / 2 + 22); // top-left
+	glEnd();
 }
+
 void drawPassenger(float x, float y) {
     // Hardcoded declared length and width of the passenger cabin
     float width = 200;
@@ -281,6 +318,8 @@ void drawPassenger(float x, float y) {
     float windowHeight = 15;
     float spacing = 35;
 
+    drawWheel(x + 40, y, 12);
+    drawWheel(x + 150, y, 12);
     // Main body
     glColor3f(0.75f, 0.25f, 0.30f);
     glBegin(GL_POLYGON);
@@ -305,13 +344,39 @@ void drawPassenger(float x, float y) {
         float wy = y + height - 20;
 
         // Window
-        glColor3f(0.55f, 0.85f, 1.0f);
+
+		float t = 0.5f + 0.5f * sin(moonAngle);// 0.5 * sin(theta) change the range from [-1, 1] to [-0.5, 0.5], then add 0.5 to shift to [0, 1] and it changes according to the moon angle
+
+        float r = 0.6f + t * (1.0f - 0.6f);
+        float g = 0.8f + t * (1.0f - 0.8f);
+        float b = 1.0f + t * (0.2f - 1.0f);
+        //C = C1 + t(C2 - C1)
+        //    Let's take for example from blue to yellow
+
+        //    (0.6, 0.8, 1.0)
+
+        //    red = 0.6 + t * (1.0 - 0.6)
+        //    blue = 1.0 + t * (0.2 - 1.0)
+		//    green = 0.8 + t * (1.0 - 0.8)
+        //        and t changes over time according to the moon angle and these equation only make the transition from light blue to light yellow
+
+        glColor3f(r, g, b);
         glBegin(GL_POLYGON);
         glVertex2f(wx, wy);// bottom-left
         glVertex2f(wx + windowWidth, wy);// bottom-right
         glVertex2f(wx + windowWidth, wy + windowHeight);// top-right
         glVertex2f(wx, wy + windowHeight);// top-left
         glEnd();
+
+		// Window frame
+        glLineWidth(2.0f);
+        glColor3f(0.2f, 0.2f, 0.2f);
+        glBegin(GL_LINE_LOOP);
+        glVertex2f(wx, wy);// bottom-left
+        glVertex2f(wx + windowWidth, wy);// bottom-right
+        glVertex2f(wx + windowWidth, wy + windowHeight);// top-right
+        glVertex2f(wx, wy + windowHeight);// top-left
+		glEnd();
     }
 
     // Bottom stripe
@@ -326,8 +391,9 @@ void drawPassenger(float x, float y) {
 
 void drawCargo(float x, float y) {
     float width = 100;
-    float height = 40;
-
+    float height = 40;\
+    drawWheel(x + 30, y, 10);
+    drawWheel(x + 70, y, 10);
     // Main body
     glColor3f(0.45f, 0.25f, 0.15f);
     glBegin(GL_POLYGON);
@@ -389,6 +455,66 @@ void drawTrain(float worldWidth) {
     drawConnector(startX - gap - cargoWidth - gap, gap, y);
 
     drawCargo(startX - gap - cargoWidth - gap - cargoWidth, y);
+
+}
+
+void drawRailWay(float worldWidth, float y, float height) {
+
+    // Ground/base under railway
+    glColor3f(0.15f, 0.15f, 0.15f);
+
+    glBegin(GL_POLYGON);
+    glVertex2f(0, y - height);
+    glVertex2f(worldWidth, y - height);
+    glVertex2f(worldWidth, y + height);
+    glVertex2f(0, y + height);
+    glEnd();
+
+    // Sleeper dimensions
+    float width1 = 20;
+    float width2 = 40;
+
+    // Wooden sleepers
+    for (float x = -offset * 0.3; x < worldWidth; x += width2) {
+
+        // wood color with slight variation
+        glColor3f(0.45f, 0.28f, 0.12f);
+
+        glBegin(GL_POLYGON);
+        glVertex2f(x, y - height);
+        glVertex2f(x + width1, y - height);
+        glVertex2f(x + width1, y);
+        glVertex2f(x, y);
+        glEnd();
+
+        // darker wood edge
+        glColor3f(0.30f, 0.18f, 0.08f);
+
+        glBegin(GL_LINE_LOOP);
+        glVertex2f(x, y - height);
+        glVertex2f(x + width1, y - height);
+        glVertex2f(x + width1, y);
+        glVertex2f(x, y);
+        glEnd();
+    }
+
+    // Top rail
+    glColor3f(0.7f, 0.7f, 0.7f);
+
+    glBegin(GL_POLYGON);
+    glVertex2f(0, y + 3);
+    glVertex2f(worldWidth, y + 3);
+    glVertex2f(worldWidth, y + 7);
+    glVertex2f(0, y + 7);
+    glEnd();
+
+    // Bottom rail
+    glBegin(GL_POLYGON);
+    glVertex2f(0, y - height - 4);
+    glVertex2f(worldWidth, y - height - 4);
+    glVertex2f(worldWidth, y - height);
+    glVertex2f(0, y - height);
+    glEnd();
 }
 
 void display() {
@@ -428,6 +554,7 @@ void display() {
 
     drawGround();
 
+    drawRailWay(worldWidth, trainBaseY, 7);
     drawTrain(worldWidth);
 
     glutSwapBuffers();// swaps hidden buffer with visible buffer
