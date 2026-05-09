@@ -154,11 +154,112 @@ void drawGround() {
     glEnd();
 }
 
-// TRAIN DRAWING FUNCTIONS
-void drawEngine() {
+void drawEngine(float x, float y) {
+    float width = 120;
+    float height = 60; // increased from 40 → taller engine
+
+    // BASE RECTANGLE
+    // Full width (120), height = 20 
+    glColor3f(0.25f, 0.25f, 0.28f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x, y); // bottom-left
+    glVertex2f(x + width, y); // bottom-right
+    glVertex2f(x + width, y + height / 2); // top-right
+    glVertex2f(x, y + height / 2);// top-left
+    glEnd();
+
+    // BASE BOTTOM STRIPE
+    // Thin red accent stripe along the bottom 
+    glColor3f(0.75f, 0.10f, 0.10f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x, y);// bottom-left
+    glVertex2f(x + width, y);// bottom-right
+    glVertex2f(x + width, y + 4);// top-right
+    glVertex2f(x, y + 4);// top-left
+    glEnd();
+
+    // top-left rectangle
+    // 40% of width height = 20, sits on top of base rect
+    float cabinWidth = width * 0.40f;
+    float cabinHeight = 30; // increased from 20
+    glColor3f(0.30f, 0.30f, 0.35f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x, y + height / 2);// bottom-left
+    glVertex2f(x + cabinWidth, y + height / 2);  // bottom-right
+    glVertex2f(x + cabinWidth, y + height / 2 + cabinHeight); // top-right
+    glVertex2f(x, y + height / 2 + cabinHeight);// top-left
+    glEnd();
+
+    // CABIN WINDOW 
+    glColor3f(0.90f, 0.80f, 0.40f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x + 8, y + height / 2 + 8);  // bottom-left (slightly raised)
+    glVertex2f(x + 30, y + height / 2 + 8);  // bottom-right
+    glVertex2f(x + 30, y + height / 2 + 22); // top-right
+    glVertex2f(x + 8, y + height / 2 + 22); // top-left
+    glEnd();
+
+    // CABIN TOP STRIPE
+    glColor3f(0.75f, 0.10f, 0.10f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x, y + height / 2 + cabinHeight - 4);// bottom-left
+    glVertex2f(x + cabinWidth, y + height / 2 + cabinHeight - 4); // bottom-right
+    glVertex2f(x + cabinWidth, y + height / 2 + cabinHeight);// top-right
+    glVertex2f(x, y + height / 2 + cabinHeight);// top-left
+    glEnd();
+
+    // PENTAGON 
+    // Width 30, height 18, flat bottom with angled top peak
+    float pentWidth = 30;
+    float pentHeight = 24; // slightly taller
+    glColor3f(0.35f, 0.22f, 0.10f);
+    glBegin(GL_POLYGON);
+    glVertex2f(x + cabinWidth, y + height / 2);  // bottom-left
+    glVertex2f(x + cabinWidth + pentWidth, y + height / 2); // bottom-right
+    glVertex2f(x + cabinWidth + pentWidth, y + height / 2 + pentHeight - 6); // upper-right
+    glVertex2f(x + cabinWidth + pentWidth / 2, y + height / 2 + pentHeight); // top-center peak
+    glVertex2f(x + cabinWidth, y + height / 2 + pentHeight - 6);  // upper-left
+    glEnd();
+
+    // CHIMNEY BASE (laying rectangle)
+    glColor3f(0.2f, 0.2f, 0.2f);
+    float baseWidth = 20; //width of the laying rectangle
+    float baseHeightChim = 5; //height of it
+    float baseX = x + cabinWidth + pentWidth + 5; //base of the laying rectange X (Where it starts)
+    float baseY = y + height / 2; //base of laying rectangle y 
+
+    glBegin(GL_POLYGON);
+    glVertex2f(baseX, baseY); // bottom-left
+    glVertex2f(baseX + baseWidth, baseY); // bottom-right
+    glVertex2f(baseX + baseWidth, baseY + baseHeightChim); // top-right
+    glVertex2f(baseX, baseY + baseHeightChim); // top-left
+    glEnd();
+
+    // CHIMNEY 
+    // vertical rectangle centered on base
+    glColor3f(0.1f, 0.1f, 0.1f);
+    float chimWidth = 8;
+    float chimHeight = 18;
+    float chimX = baseX + baseWidth / 2 - chimWidth / 2;
+
+    glBegin(GL_POLYGON);
+    glVertex2f(chimX, baseY + baseHeightChim); // bottom-left
+    glVertex2f(chimX + chimWidth, baseY + baseHeightChim); // bottom-right
+    glVertex2f(chimX + chimWidth, baseY + baseHeightChim + chimHeight); // top-right
+    glVertex2f(chimX, baseY + baseHeightChim + chimHeight); // top-left
+    glEnd();
+
+    // LOCOMOTIVE FRONT NOSE 
+    // Sits at the far right of the base rect
+    float triWidth = 30;
+    glColor3f(0.45f, 0.15f, 0.10f);
+    glBegin(GL_TRIANGLES);
+    glVertex2f(x + width, y + height / 2); // top-left of triangle base
+    glVertex2f(x + width, y);            // bottom-left of triangle base
+    glVertex2f(x + width + triWidth, y); // point OUTWARD 
+    glEnd();
 
 }
-
 void drawPassenger(float x, float y) {
     // Hardcoded declared length and width of the passenger cabin
     float width = 200;
@@ -263,6 +364,10 @@ void drawTrain(float worldWidth) {
 
     float passengerWidth = 200;
     float cargoWidth = 100;
+
+    drawEngine(startX + gap + 200, y);
+
+    drawConnector(startX + 200 ,gap, y);
 
     drawPassenger(startX, y);
 
