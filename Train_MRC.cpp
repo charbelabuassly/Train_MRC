@@ -27,8 +27,8 @@ void drawCircle(float cx, float cy, float radius, int segments) {
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(cx, cy); // center point
     for (int i = 0; i <= segments; i++) {
-        float angle = 2.0f * 3.14159f * i / segments;
-        glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius);
+		float angle = 2.0f * 3.14159f * i / segments; // angle goes from 0 to 2PI as i goes from 0 to segments
+		glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius); // point on the circle edge at the current angle
     }
     glEnd();
 }
@@ -52,11 +52,10 @@ void drawStars()
 }
 
 void drawSky() {
-    float s = sin(sunAngle); // -1 = midnight, 0 = horizon, +1 = noon
+    float s = sin(sunAngle); // -1 = midnight, 0 = horizon, +1 = noon [-1, 1]
 
-    // FIX: proper day/night/sunrise/sunset color transitions
     // t goes 0 (night) => 1 (full day) based on sun height
-    float t = (s + 1.0f) / 2.0f; // 0.0 at midnight, 1.0 at noon
+    float t = (s + 1.0f) / 2.0f; // 0.0 at midnight, 1.0 at noon [0, 1]
 
     // horizon glow during sunrise/sunset, peaks when sun is near horizon (s ≈ 0)
     float horizonGlow = 1.0f - fabsf(s); // 1.0 at horizon, 0.0 at noon/midnight
@@ -66,12 +65,11 @@ void drawSky() {
     red = 0.08f * (1.0f - t) + 0.55f * t + 0.7f * horizonGlow * t;
     green = 0.06f * (1.0f - t) + 0.70f * t + 0.25f * horizonGlow * t;
     blue = 0.18f * (1.0f - t) + 0.98f * t - 0.25f * horizonGlow * t;
-
     // clamp so colors stay valid
-    if (red > 1.0f) red = 1.0f;
-    if (green > 1.0f) green = 1.0f;
-    if (blue > 1.0f) blue = 1.0f;
-    if (blue < 0.0f) blue = 0.0f;
+    //if (red > 1.0f) red = 1.0f;
+    //if (green > 1.0f) green = 1.0f;
+    //if (blue > 1.0f) blue = 1.0f;
+    //if (blue < 0.0f) blue = 0.0f;
 
     glClearColor(red, green, blue, 1.0f); // Set the background color
 }
@@ -392,7 +390,7 @@ void drawPassenger(float x, float y) {
 
 void drawCargo(float x, float y) {
     float width = 100;
-    float height = 40;\
+    float height = 40;
     drawWheel(x + 30, y, 10);
     drawWheel(x + 70, y, 10);
     // Main body
@@ -440,16 +438,16 @@ void drawSmoke(float x, float y) {
     glPointSize(3.0f);
     glBegin(GL_POINTS);
 
-    for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 100; i++) {// draw 100 smoke puffs
 
-        float rise = rand() % 30;
+        float rise = rand() % 30;// puts the smoke above the chimney and makes it rise up to 30 units above the chimey
 
-        float randomX = rand() % 20 - 10;
+        float randomX = rand() % 20 - 10;// randomX and randomY spreads the smoke points
         float randomY = rand() % 10 - 5;
 
         // offset only changes the shape, not the position
-        float wave = sin((offset + i) * 0.1f) * 4.0f;
-
+        float wave = sin((offset + i) * 0.1f) * 4.0f; // makes the spoke shape move left/right smoothly
+        // put the offset in sin() since if it is outside the sin() it will just move away
         float puffX = x + randomX + wave;
         float puffY = y + rise + randomY;
 
@@ -496,12 +494,11 @@ void drawRailWay(float worldWidth, float y, float height) {
     glVertex2f(0, y + height);
     glEnd();
 
-    // Sleeper dimensions
     float width1 = 17;
-    float width2 = 20;
+	float width2 = 20;
 
     // Wooden sleepers
-    for (float x = -offset * 0.3; x < worldWidth; x += width2) {
+	for (float x = -offset * 0.3; x < worldWidth; x += width2) {// sleepers are spaced every 20 units, but we offset them by a fraction of the train's offset to create the illusion of movement
 
         // wood color with slight variation
         glColor3f(0.45f, 0.28f, 0.12f);
