@@ -293,13 +293,14 @@ void drawEngine(float x, float y) {
     glEnd();
 	
 
-    drawWheel(x + 100, y, 12);
-    drawWheel(x + 20, y, 12);
-    drawWheel(x + 45, y, 12);
+    drawWheel(x + 20, y + 2, 12);
+    drawWheel(x + 45, y + 2, 12);
+    drawWheel(x + 100, y, 10);
 
     //Window frame
-	glColor3f(0.2f, 0.2f, 0.2f);
-	glLineWidth(4.0f);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    //make the frames compatible with the windows size 
+    glLineWidth(3.0);
     glBegin(GL_LINE_LOOP);
     glVertex2f(x + 8, y + height / 2 + 8);  // bottom-left (slightly raised)
     glVertex2f(x + 30, y + height / 2 + 8);  // bottom-right
@@ -318,8 +319,8 @@ void drawPassenger(float x, float y) {
     float windowHeight = 15;
     float spacing = 35;
 
-    drawWheel(x + 40, y, 12);
-    drawWheel(x + 150, y, 12);
+    drawWheel(x + 40, y, 10);
+    drawWheel(x + 150, y, 10);
     // Main body
     glColor3f(0.75f, 0.25f, 0.30f);
     glBegin(GL_POLYGON);
@@ -370,7 +371,7 @@ void drawPassenger(float x, float y) {
 
 		// Window frame
         glLineWidth(2.0f);
-        glColor3f(0.2f, 0.2f, 0.2f);
+        glColor3f(0.95f, 0.85f, 0.65f);
         glBegin(GL_LINE_LOOP);
         glVertex2f(wx, wy);// bottom-left
         glVertex2f(wx + windowWidth, wy);// bottom-right
@@ -434,9 +435,34 @@ void drawConnector(float startX, float gap, float y) {
     glEnd();
 }
 
+void drawSmoke(float x, float y) {
+
+    glPointSize(3.0f);
+    glBegin(GL_POINTS);
+
+    for (int i = 0; i < 100; i++) {
+
+        float rise = rand() % 30;
+
+        float randomX = rand() % 20 - 10;
+        float randomY = rand() % 10 - 5;
+
+        // offset only changes the shape, not the position
+        float wave = sin((offset + i) * 0.1f) * 4.0f;
+
+        float puffX = x + randomX + wave;
+        float puffY = y + rise + randomY;
+
+        glColor3f(0.8f, 0.8f, 0.8f);
+        glVertex2f(puffX, puffY);
+    }
+
+    glEnd();
+}
+
 void drawTrain(float worldWidth) {
     float startX = int(worldWidth / 2 - worldWidth / 6);
-    float y = trainBaseY;
+    float y = trainBaseY + 2;
     float gap = 10;
 
     float passengerWidth = 200;
@@ -461,7 +487,7 @@ void drawTrain(float worldWidth) {
 void drawRailWay(float worldWidth, float y, float height) {
 
     // Ground/base under railway
-    glColor3f(0.15f, 0.15f, 0.15f);
+    glColor3f(0.2f, 0.2f, 0.2f);
 
     glBegin(GL_POLYGON);
     glVertex2f(0, y - height);
@@ -471,8 +497,8 @@ void drawRailWay(float worldWidth, float y, float height) {
     glEnd();
 
     // Sleeper dimensions
-    float width1 = 20;
-    float width2 = 40;
+    float width1 = 17;
+    float width2 = 20;
 
     // Wooden sleepers
     for (float x = -offset * 0.3; x < worldWidth; x += width2) {
@@ -482,20 +508,10 @@ void drawRailWay(float worldWidth, float y, float height) {
 
         glBegin(GL_POLYGON);
         glVertex2f(x, y - height);
-        glVertex2f(x + width1, y - height);
-        glVertex2f(x + width1, y);
-        glVertex2f(x, y);
-        glEnd();
-
-        // darker wood edge
-        glColor3f(0.30f, 0.18f, 0.08f);
-
-        glBegin(GL_LINE_LOOP);
-        glVertex2f(x, y - height);
-        glVertex2f(x + width1, y - height);
-        glVertex2f(x + width1, y);
-        glVertex2f(x, y);
-        glEnd();
+        glVertex2f(x + width1 / 3, y - height);
+        glVertex2f(x + width1 / 3, y + 3);
+        glVertex2f(x, y + 3);
+        glEnd();   
     }
 
     // Top rail
@@ -516,6 +532,7 @@ void drawRailWay(float worldWidth, float y, float height) {
     glVertex2f(0, y - height);
     glEnd();
 }
+
 
 void display() {
     float worldWidth = 400.0f * ((float)winW / winH);
@@ -556,7 +573,11 @@ void display() {
 
     drawRailWay(worldWidth, trainBaseY, 7);
     drawTrain(worldWidth);
-
+    //draw the smoke on the chimney engine
+ 
+	float chimneyX = worldWidth / 2 - worldWidth / 6 + 63 + 200 + 40; // x position of the chimney
+	float chimneyY = trainBaseY + 60 + 7; // y position of the chimney (base height + engine height + chimney base height)
+	drawSmoke(chimneyX, chimneyY);
     glutSwapBuffers();// swaps hidden buffer with visible buffer
 }
 
