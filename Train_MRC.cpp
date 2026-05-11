@@ -171,7 +171,7 @@ void drawWheel(float cx, float cy, float radius) {
     glColor3f(0.2f, 0.2f, 0.2f);
     glBegin(GL_LINES);
     for (int i = 0; i < 8; i++) {
-        float angle = -offset * 0.001f + i * 3.14159f / 4; // rotates the spokes based on the offset the equation is : angle = offset * 0.1f + i * (PI / 4) where offset * 0.1f controls the rotation speed and i * (PI / 4) spaces the spokes evenly around the wheel
+        float angle = -offset * 0.01f + i * 3.14159f / 4; // rotates the spokes based on the offset the equation is : angle = offset * 0.1f + i * (PI / 4) where offset * 0.1f controls the rotation speed and i * (PI / 4) spaces the spokes evenly around the wheel
         glVertex2f(cx, cy); // center of the wheel
         glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius); // end of the 
     }
