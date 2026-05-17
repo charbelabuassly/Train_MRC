@@ -546,9 +546,9 @@ void display() {
 
     glClear(GL_COLOR_BUFFER_BIT); //Wipe out the entire screen before drawing every single time
 
-    //// FIX: reset modelview every frame
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();// resets the transformation matrix
+    // FIX: reset modelview every frame
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();// resets the transformation matrix
 
     drawStars();
     drawSun();
