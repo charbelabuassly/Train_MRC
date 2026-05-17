@@ -27,7 +27,7 @@ void drawCircle(float cx, float cy, float radius, int segments) {
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(cx, cy); // center point
     for (int i = 0; i <= segments; i++) {
-		float angle = 2.0f * 3.14159f * i / segments; // angle goes from 0 to 2PI as i goes from 0 to segments
+		float angle = 2.0f * 3.14159f * i / segments; // angle goes from 0 to 2PI as i goes from 0 to segments, why i/ segments? because we want to divide the circle into equal segments and get the angle for each segment
 		glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius); // point on the circle edge at the current angle
     }
     glEnd();
@@ -77,13 +77,12 @@ void drawSky() {
 void drawSun() {
     glPushMatrix();// saves current transformation
 
-    float worldWidth = 400.0f * ((float)winW / winH);
+    float worldWidth = 400.0f * ((float)winW / winH);// 400 is the base width of the world
 
     // coordinates of a ellipse around the center of the screen, 
     float x = cos(sunAngle) * (worldWidth / 2.0f + 50) + worldWidth / 2.0f; // cos(x)*radius + centerX 
     float y = sin(sunAngle) * 150 + 200;// sin(x)* radius + centerY
-    //centerX and centerY are two focus points of the ellipse, radius is the distance from the center to the edge of the ellipse along the x or y axis.
-
+    // center x and center y are the coordinates of the center of the screen
     glColor3f(1.0f, 0.85f, 0.3f);
     drawCircle(x, y, 20, 48);
 
@@ -171,7 +170,7 @@ void drawWheel(float cx, float cy, float radius) {
     glColor3f(0.2f, 0.2f, 0.2f);
     glBegin(GL_LINES);
     for (int i = 0; i < 8; i++) {
-        float angle = -offset * 0.01f + i * 3.14159f / 4; // rotates the spokes based on the offset the equation is : angle = offset * 0.1f + i * (PI / 4) where offset * 0.1f controls the rotation speed and i * (PI / 4) spaces the spokes evenly around the wheel
+		float angle = -offset * 0.01f + i * 3.14159f / 4;
         glVertex2f(cx, cy); // center of the wheel
         glVertex2f(cx + cos(angle) * radius, cy + sin(angle) * radius); // end of the 
     }
@@ -217,10 +216,20 @@ void drawEngine(float x, float y) {
     // CABIN WINDOW 
 	// change the windows color from blue when there is sun slowly to yellow when there is moon 
     float t = 0.5f + 0.5f * sin(moonAngle);
+	// t goes from 0 (moon down) to 1 (moon up) based on the moon angle.
+	float r = 0.6f + t * (1.0f - 0.6f);// 0.6 is the base red value for the window, and it transitions to 1.0 (full red) as t goes from 0 to 1
+	float g = 0.8f + t * (1.0f - 0.8f);// 0.8 is the base green value for the window, and it transitions to 1.0 (full green) as t goes from 0 to 1
+	float b = 1.0f + t * (0.2f - 1.0f);// 1.0 is the base blue value for the window, and it transitions to 0.2 (darker blue) as t goes from 0 to 1, creating a transition from light blue to light yellow
 
-    float r = 0.6f + t * (1.0f - 0.6f);
-    float g = 0.8f + t * (1.0f - 0.8f);
-    float b = 1.0f + t * (0.2f - 1.0f);
+    //C = C1 + t(C2 - C1)
+       //    Let's take for example from blue to yellow
+
+       //    (0.6, 0.8, 1.0)
+
+       //    red = 0.6 + t * (1.0 - 0.6)
+       //    blue = 1.0 + t * (0.2 - 1.0)
+       //    green = 0.8 + t * (1.0 - 0.8)
+       //        and t changes over time according to the moon angle and these equation only make the transition from light blue to light yellow
 
     glColor3f(r, g, b);
     glBegin(GL_POLYGON);
@@ -497,7 +506,7 @@ void drawRailWay(float worldWidth, float y, float height) {
     float width1 = 17;
 	float width2 = 20;
 
-    // Wooden sleepers
+    // Wooden sleeper
 	for (float x = -offset * 0.3; x < worldWidth; x += width2) {// sleepers are spaced every 20 units, but we offset them by a fraction of the train's offset to create the illusion of movement
 
         // wood color with slight variation
@@ -532,14 +541,14 @@ void drawRailWay(float worldWidth, float y, float height) {
 
 
 void display() {
-    float worldWidth = 400.0f * ((float)winW / winH);
+    float worldWidth = 400.0f * ((float)winW / winH); 
     drawSky();
 
     glClear(GL_COLOR_BUFFER_BIT); //Wipe out the entire screen before drawing every single time
 
-    // FIX: reset modelview every frame
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();// resets the transformation matrix
+    //// FIX: reset modelview every frame
+    //glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();// resets the transformation matrix
 
     drawStars();
     drawSun();
@@ -573,7 +582,7 @@ void display() {
     //draw the smoke on the chimney engine
  
 	float chimneyX = worldWidth / 2 - worldWidth / 6 + 63 + 200 + 40; // x position of the chimney
-	float chimneyY = trainBaseY + 60 + 7; // y position of the chimney (base height + engine height + chimney base height)
+	float chimneyY = trainBaseY + 60 + 7; // y position of the chimney 
 	drawSmoke(chimneyX, chimneyY);
     glutSwapBuffers();// swaps hidden buffer with visible buffer
 }
@@ -584,7 +593,7 @@ void update() {
     offsetFar += 0.06f;   // far back moves slowest
 
     // reset early 
-    if (offset >= 240 * 26) offset -= 240 * 26;
+    if (offset >= 240 * 26) offset -= 240 * 26; 
     if (offsetBack >= 200 * 26) offsetBack -= 200 * 26;
     if (offsetFar >= 280 * 26) offsetFar -= 280 * 26;
 
@@ -595,16 +604,16 @@ void update() {
     if (sunAngle > 2 * 3.14159f) sunAngle = 0.0f;
     if (moonAngle > 2 * 3.14159f) moonAngle = 0.0f;
 
-    glutPostRedisplay();// redraws the screen
+    glutPostRedisplay();// redraws the screen 
 }
 
 // Called automatically whenever the window is resized
 void reshape(int w, int h) {
     winW = w;
     winH = h;
-    glViewport(0, 0, w, h);          //fill the whole window
+    glViewport(0, 0, w, h);          //fill the whole window 
 
-    glMatrixMode(GL_PROJECTION); //We tell opengl to apply all matrix operations on the projection matrix
+    glMatrixMode(GL_PROJECTION); //We tell opengl to apply all matrix operations on the projection matrix 
     glLoadIdentity(); //Wipe out the old projection matrix
 
     float aspect = (float)w / (float)h;
